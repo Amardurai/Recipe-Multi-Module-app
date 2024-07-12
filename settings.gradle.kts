@@ -21,3 +21,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "Recipe-Multi-Module-app"
 include(":app")
+include(":common")
+include(":feature")
+include(":feature:search:ui")
+include(":feature:search:domain")
+include(":feature:search:data")
