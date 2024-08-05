@@ -43,68 +43,61 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version = "1.2.0" }
-dagger-hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 
-# Compose
-hilt-android = { group = "com.google.dagger", name="hilt-android", version.ref = "hilt" }
-hilt-android-compiler = { group = "com.google.dagger", name="hilt-android-compiler", version.ref = "hilt" }
-hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
+dagger-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+dagger-hilt-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
+hilt-compose-navigation = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
+hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 
+# Testing
+annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
+junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version = "1.1.5" }
+junit-ext = { group = "androidx.test.ext", name = "junit", version = "1.1.5" }
+mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockitoCore" }
+android-test-mockito = { group = "org.mockito", name = "mockito-android", version.ref = "mockitoCore" }
+android-test-mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockitoInline" }
+espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+espresso-contrib = { group = "androidx.test.espresso", name = "espresso-contrib", version.ref = "espressoCore" }
+test-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 
-#testing
-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitVersion" }
-junit-ext = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
-mockito = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
-android-test-mockito = { module = "org.mockito:mockito-android", version.ref = "mockitoCore" }
-android-test-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
-espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espressoCore" }
+# Networking
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-gson-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 
-# Coroutines
-kotlinx-coroutines = { group="org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+# Lifecycle
+lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.7.0" }
+lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version = "2.7.0" }
+lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version = "2.7.0" }
+lifecycle-saved-state = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version = "2.7.0" }
 
-#networking
-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-retrofit-gson-convertor = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+# Room Database
+room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
-#lifecycle
-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleRuntimeKtx" }
-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleRuntimeKtx" }
-lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
-lifecycle-saved-state = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycleRuntimeKtx" }
+# Coil Image Loading Library
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
-#room-database
-room = { module = "androidx.room:room-runtime", version.ref = "room" }
-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+# MockK
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockkAgent" }
 
-#coil image loading library only used for android native dev
-coil = { module = "io.coil-kt:coil", version.ref = "coil" }
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-
-#mockk
-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
-mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkAgent" }
-
-#collect as state
-compose-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "composeRuntimeLivedata" }
+# Collect as State
+compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "composeRuntimeLivedata" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 engage-core = { group = "com.google.android.engage", name = "engage-core", version.ref = "engageCore" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+# ExoPlayer with Media 3
+media-three-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "mediaThree" }
+media-three-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "mediaThree" }
+media-three-common = { group = "androidx.media3", name = "media3-common", version.ref = "mediaThree" }
 
-#exoplayer with media 3
-media-three-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "mediaThree" }
-media-three-ui = { module = "androidx.media3:media3-ui", version.ref = "mediaThree" }
-media-three-common = { module = "androidx.media3:media3-common", version.ref = "mediaThree" }
-
-#youtube video player
-youtube-video-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender", version.ref = "youtubePlayer" }
+# YouTube Video Player
+youtube-video-player = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "chromecast-sender", version.ref = "youtubePlayer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

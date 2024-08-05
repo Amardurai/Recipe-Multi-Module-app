@@ -1,6 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.hiltAndroid)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.kotlinAndroidKsp)
 }
 
 android {
@@ -34,10 +38,19 @@ android {
 
 dependencies {
 
+    implementation(project(":feature:search:domain"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson.converter)
+
+    implementation(libs.dagger.hilt)
+    ksp(libs.hilt.android.compiler)
+
+
 }
