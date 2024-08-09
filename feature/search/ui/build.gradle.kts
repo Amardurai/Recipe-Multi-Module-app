@@ -48,6 +48,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(libs.lifecycle.viewmodel)
+
     implementation(libs.dagger.hilt)
     ksp(libs.hilt.android.compiler)
 }
