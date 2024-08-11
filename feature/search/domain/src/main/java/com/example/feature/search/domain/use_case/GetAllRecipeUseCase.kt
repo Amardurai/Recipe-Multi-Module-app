@@ -1,6 +1,6 @@
 package com.example.feature.search.domain.use_case
 
-import com.example.common.NetworkResult
+import com.example.common.utils.NetworkResult
 import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.domain.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers

@@ -1,4 +1,4 @@
-package com.example.common
+package com.example.common.utils
 
 sealed class NetworkResult<out T> {
     data class Success<out T>(val data: T) : NetworkResult<T>()

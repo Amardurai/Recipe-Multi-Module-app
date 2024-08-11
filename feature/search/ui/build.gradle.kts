@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.feature.search.ui"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -48,8 +48,19 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    //Compose
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
+
     implementation(libs.lifecycle.viewmodel)
 
     implementation(libs.dagger.hilt)
     ksp(libs.hilt.android.compiler)
+
+
+    // Navigation
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.androidx.runtime)
+
 }

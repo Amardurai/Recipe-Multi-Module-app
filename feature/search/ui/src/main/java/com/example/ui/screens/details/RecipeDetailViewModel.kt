@@ -2,7 +2,7 @@ package com.example.ui.screens.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.common.NetworkResult
+import com.example.common.utils.NetworkResult
 import com.example.feature.search.domain.use_case.GetRecipeDetailUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +16,7 @@ class RecipeDetailViewModel @Inject constructor(private val getRecipeDetailUseCa
     private val _uiState = MutableStateFlow(RecipeDetailState())
     val uiState = _uiState.asStateFlow()
 
-    fun getRecipeDetails(id: String) = getRecipeDetailUseCase(id).onEach { networkResult ->
+    private fun getRecipeDetails(id: String) = getRecipeDetailUseCase(id).onEach { networkResult ->
         when (networkResult) {
             NetworkResult.Loading -> _uiState.update { RecipeDetailState(loading = true) }
             is NetworkResult.Error -> _uiState.update { RecipeDetailState(error = networkResult.message) }

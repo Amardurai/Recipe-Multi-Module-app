@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.example.recipe_multi_module_app"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.recipe_multi_module_app"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -53,6 +53,12 @@ android {
 
 dependencies {
 
+    implementation(project(":common"))
+    implementation(project(":feature:search:data"))
+    implementation(project(":feature:search:domain"))
+    implementation(project(":feature:search:ui"))
+    implementation(project(":media_player"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -74,4 +80,8 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson.converter)
+
+    implementation(libs.navigation.compose)
+    implementation(libs.androidx.runtime)
+
 }
