@@ -51,16 +51,22 @@ dependencies {
     //Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
+
+    //Compose Preview
+    implementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.ui.tooling.preview)
 
     implementation(libs.lifecycle.viewmodel)
 
     implementation(libs.dagger.hilt)
     ksp(libs.hilt.android.compiler)
 
+    implementation(libs.coil.compose)
 
     // Navigation
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization)
     implementation(libs.androidx.runtime)
-
+    implementation(libs.hilt.compose.navigation)
 }
