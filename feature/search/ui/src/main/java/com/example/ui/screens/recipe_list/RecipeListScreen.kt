@@ -1,10 +1,9 @@
 package com.example.ui.screens.recipe_list
 
-import android.graphics.drawable.Icon
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
@@ -27,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -35,10 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.feature.search.domain.model.Recipe
 
 @Composable
 fun RecipeListScreen(
@@ -52,108 +52,149 @@ fun RecipeListScreen(
 
     Scaffold(
         topBar = {
-            TextField(
-                value = query.value, onValueChange = {
-                    query.value = it
-                    onEvent.invoke(RecipeListEvent.OnSearchQueryChange(it))
-                },
-                colors = TextFieldDefaults.colors().copy(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
-                ),
-                placeholder = { Text(text = "Search Recipe") },
-                trailingIcon = {
-                    Icon(Icons.Filled.Search, "Search")
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+            SearchBar(query = query.value, onQueryChange = {
+                query.value = it
+                onEvent.invoke(RecipeListEvent.OnSearchQueryChange(it))
+            })
         }
     ) { innerPadding ->
         Surface(modifier = Modifier.padding(innerPadding)) {
-            if (uiState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+            when {
+                uiState.isLoading -> LoadingIndicator()
+
+                uiState.error.isNotEmpty() -> ErrorMessage(uiState.error)
+
+                else -> RecipeList(uiState.recipes) { recipeId ->
+                    onEvent(RecipeListEvent.onRecipeItemSelected(recipeId))
                 }
+
             }
-            if (uiState.error.isNotEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(uiState.error)
-                }
-            }
-
-            RecipeList(uiState, onRecipeClick = {
-                onEvent.invoke(RecipeListEvent.onRecipeItemSelected(it))
-            })
-
-
         }
 
     }
+}
+
+@Composable
+fun ErrorMessage(error: String) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(error)
+    }
+}
+
+@Composable
+fun LoadingIndicator() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
+
+    TextField(
+        value = query, onValueChange = {
+            onQueryChange(it)
+        },
+        colors = TextFieldDefaults.colors().copy(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+        ),
+        placeholder = { Text(text = "Search Recipe") },
+        leadingIcon = {
+            Icon(Icons.Filled.Search, "Search")
+        },
+        shape = RoundedCornerShape(40.dp),
+        modifier = Modifier.padding(10.dp).fillMaxWidth()
+    )
+}
+
+@Composable
+private fun RecipeList(recipes: List<Recipe>, onRecipeClick: (String) -> Unit) {
+
+    LazyColumn {
+        items(recipes, key = { it.idMeal.orEmpty() }) { recipe ->
+            RecipeCard(recipe, onRecipeClick)
+        }
+    }
+
+}
+
+@Composable
+fun RecipeCard(recipe: Recipe, onRecipeClick: (String) -> Unit) {
+    Card(
+        modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp),
+        shape = RoundedCornerShape(12.dp),
+        onClick = { onRecipeClick(recipe.idMeal.orEmpty()) }
+    ) {
+        RecipeImage(recipe)
+        Spacer(modifier = Modifier.height(12.dp))
+        RecipeDetail(recipe)
+
+    }
+
+}
+
+@Composable
+fun RecipeImage(recipe: Recipe) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(recipe.strMealThumb).crossfade(true).build(),
+        contentDescription = "Recipe Image",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxWidth().height(250.dp),
+    )
+}
+
+@Composable
+fun RecipeDetail(recipe: Recipe) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+            .padding(vertical = 6.dp, horizontal = 12.dp)
+    ) {
+
+        Text(
+            text = recipe.strMeal.orEmpty(),
+            style = MaterialTheme.typography.bodyLarge,
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = recipe.strInstruction.orEmpty(),
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 4,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        recipe.strTags?.let { RecipeTags(it) }
+
+
+    }
+
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun RecipeList(uiState: RecipeListState, onRecipeClick: (String) -> Unit) {
-    uiState.recipes.let { recipes ->
-        LazyColumn {
-            items(recipes, key = { it.idMeal.orEmpty() }) { recipe ->
-                Card(
-                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    onClick = { onRecipeClick(recipe.idMeal.orEmpty()) }
-                ) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(recipe.strMealThumb).crossfade(true).build(),
-                        contentDescription = "Recipe Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxWidth().height(250.dp),
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = recipe.strMeal.orEmpty(),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = recipe.strInstruction.orEmpty(),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    if (recipe.strTags?.isNotEmpty() == true) {
-                        FlowRow {
-                            recipe.strTags?.split(",")?.forEach {
-                                Box(
-                                    modifier = Modifier.background(
-                                        Color.White,
-                                        shape = RoundedCornerShape(12.dp)
-                                    ).border(
-                                        width = 1.dp,
-                                        color = Color.Red,
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(it, style = MaterialTheme.typography.bodySmall)
-                                }
-                            }
-                        }
-                    }
-
-                }
+private fun RecipeTags(tags: String) {
+    FlowRow {
+        tags.split(",").forEach { tag ->
+            Box(
+                modifier = Modifier.padding(horizontal = 4.dp)
+                    .background(Color.White, shape = RoundedCornerShape(24.dp))
+                    .border(1.dp, Color.Red, RoundedCornerShape(24.dp))
+                    .padding(vertical = 6.dp, horizontal = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(tag, style = MaterialTheme.typography.bodySmall.copy(color = Color.Black))
             }
         }
     }
 }
 
-@Preview
+
+@Preview(showBackground = true)
 @Composable
 private fun PreviewRecipeListScreen() {
     RecipeListScreen(RecipeListState()) {

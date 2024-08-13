@@ -18,6 +18,10 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    buildFeatures{
+        compose = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -54,7 +58,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 
     //Compose Preview
-    implementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
 
     implementation(libs.lifecycle.viewmodel)
