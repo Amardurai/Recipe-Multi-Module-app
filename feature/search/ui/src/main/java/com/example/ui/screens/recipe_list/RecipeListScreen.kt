@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.feature.search.domain.model.Recipe
+import com.example.feature.search.ui.R
 
 @Composable
 fun RecipeListScreen(
@@ -104,7 +105,9 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
             Icon(Icons.Filled.Search, "Search")
         },
         shape = RoundedCornerShape(40.dp),
-        modifier = Modifier.padding(10.dp).fillMaxWidth()
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth()
     )
 }
 
@@ -138,17 +141,24 @@ fun RecipeCard(recipe: Recipe, onRecipeClick: (String) -> Unit) {
 fun RecipeImage(recipe: Recipe) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(recipe.strMealThumb).crossfade(true).build(),
+            .data(recipe.strMealThumb)
+            .crossfade(true)
+            .placeholder(R.drawable.ic_launcher_background)
+            .error(R.drawable.ic_launcher_background)
+            .build(),
         contentDescription = "Recipe Image",
         contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxWidth().height(250.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp),
     )
 }
 
 @Composable
 fun RecipeDetail(recipe: Recipe) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(vertical = 6.dp, horizontal = 12.dp)
     ) {
 
@@ -181,7 +191,8 @@ private fun RecipeTags(tags: String) {
     FlowRow {
         tags.split(",").forEach { tag ->
             Box(
-                modifier = Modifier.padding(horizontal = 4.dp)
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
                     .background(Color.White, shape = RoundedCornerShape(24.dp))
                     .border(1.dp, Color.Red, RoundedCornerShape(24.dp))
                     .padding(vertical = 6.dp, horizontal = 8.dp),
