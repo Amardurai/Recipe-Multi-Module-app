@@ -11,20 +11,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.recipe_multi_module_app.navigation.NavigationSubGraphs
+import com.example.recipe_multi_module_app.navigation.RecipeNavigation
 import com.example.recipe_multi_module_app.ui.theme.RecipeMultiModuleappTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var navigationSubGraphs: NavigationSubGraphs
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContent {
             RecipeMultiModuleappTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                RecipeNavigation(navigationSubGraphs = navigationSubGraphs)
             }
         }
     }

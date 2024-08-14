@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.feature.search.domain"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -48,5 +48,6 @@ dependencies {
 
     implementation(libs.dagger.hilt)
     ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.runtime)
 
 }
