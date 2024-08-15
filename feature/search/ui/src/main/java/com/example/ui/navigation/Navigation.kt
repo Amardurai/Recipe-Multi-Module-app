@@ -7,7 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.common.navigation.Dest
@@ -27,8 +27,9 @@ class SearchFeatureApiImpl : SearchFeatureApi {
         navGraphBuilder.navigation<SubGraphDest.RecipeSearch>(startDestination = Dest.RecipeList) {
             composable<Dest.RecipeList> {
                 val viewModel = hiltViewModel<RecipeListViewModel>()
-                val uiState = viewModel.uiState.collectAsState()
-                RecipeListScreen(uiState.value, viewModel::onEvent)
+                val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+                val events = viewModel.events
+                RecipeListScreen(uiState.value,events, viewModel::onAction,navHostController)
             }
             composable<Dest.RecipeDetail> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

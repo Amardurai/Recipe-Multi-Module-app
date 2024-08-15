@@ -1,6 +1,6 @@
 package com.example.ui.screens.recipe_list
 
-sealed class RecipeListEvent {
-    data class OnSearchQueryChange(val query: String) : RecipeListEvent()
-    data class onRecipeItemSelected(val id: String) : RecipeListEvent()
+sealed interface RecipeListEvent {
+    data class OnError(val message: String) : RecipeListEvent
+    data class GoToDetailScreen(val mealID:String) : RecipeListEvent
 }

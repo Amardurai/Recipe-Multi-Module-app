@@ -36,17 +36,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.common.components.ObserveAsEvent
+import com.example.common.navigation.Dest
 import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.ui.R
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun RecipeListScreen(
     uiState: RecipeListState,
-    onEvent: (RecipeListEvent) -> Unit
+    events: Flow<RecipeListEvent>,
+    onEvent: (RecipeListAction) -> Unit,
+    navHostController: NavHostController
 ) {
 
+    ObserveAsEvent(events) { event ->
+        when (event) {
+
+            is RecipeListEvent.OnError -> {
+
+            }
+
+            is RecipeListEvent.GoToDetailScreen -> navHostController.navigate(
+                Dest.RecipeDetail(
+                    event.mealID
+                )
+            )
+        }
+    }
     val query = rememberSaveable {
         mutableStateOf("")
     }
@@ -55,7 +75,7 @@ fun RecipeListScreen(
         topBar = {
             SearchBar(query = query.value, onQueryChange = {
                 query.value = it
-                onEvent.invoke(RecipeListEvent.OnSearchQueryChange(it))
+                onEvent.invoke(RecipeListAction.OnSearchQueryChange(it))
             })
         }
     ) { innerPadding ->
@@ -66,7 +86,7 @@ fun RecipeListScreen(
                 uiState.error.isNotEmpty() -> ErrorMessage(uiState.error)
 
                 else -> RecipeList(uiState.recipes) { recipeId ->
-                    onEvent(RecipeListEvent.onRecipeItemSelected(recipeId))
+                    onEvent(RecipeListAction.OnRecipeItemClicked(recipeId))
                 }
 
             }
@@ -208,7 +228,5 @@ private fun RecipeTags(tags: String) {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewRecipeListScreen() {
-    RecipeListScreen(RecipeListState()) {
 
-    }
 }
