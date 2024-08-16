@@ -1,18 +1,16 @@
 package com.example.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.toRoute
 import com.example.common.navigation.Dest
 import com.example.common.navigation.FeatureApi
 import com.example.common.navigation.SubGraphDest
+import com.example.ui.screens.details.RecipeDetailEvent
+import com.example.ui.screens.details.RecipeDetailScreen
+import com.example.ui.screens.details.RecipeDetailViewModel
 import com.example.ui.screens.recipe_list.RecipeListScreen
 import com.example.ui.screens.recipe_list.RecipeListViewModel
 
@@ -29,12 +27,16 @@ class SearchFeatureApiImpl : SearchFeatureApi {
                 val viewModel = hiltViewModel<RecipeListViewModel>()
                 val uiState = viewModel.uiState.collectAsStateWithLifecycle()
                 val events = viewModel.events
-                RecipeListScreen(uiState.value,events, viewModel::onAction,navHostController)
+                RecipeListScreen(uiState.value, events, viewModel::onAction, navHostController)
             }
             composable<Dest.RecipeDetail> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Recipe Detail")
-                }
+                val viewModel = hiltViewModel<RecipeDetailViewModel>()
+                val mealId = it.toRoute<Dest.RecipeDetail>().id
+
+                viewModel.onEvent(RecipeDetailEvent.FetchRecipeDetail(mealId))
+
+                val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+                RecipeDetailScreen(uiState.value)
             }
         }
     }

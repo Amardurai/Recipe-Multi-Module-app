@@ -26,7 +26,7 @@ class RecipeDetailViewModel @Inject constructor(private val getRecipeDetailUseCa
 
     fun onEvent(recipeDetailEvent: RecipeDetailEvent) {
         when (recipeDetailEvent) {
-            is RecipeDetailEvent.OnRecipeSelected -> {
+            is RecipeDetailEvent.FetchRecipeDetail -> {
                 getRecipeDetails(recipeDetailEvent.id)
             }
         }
