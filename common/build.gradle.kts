@@ -52,4 +52,8 @@ dependencies {
     implementation(libs.kotlinx.serialization)
     implementation(libs.androidx.runtime)
 
+    //Compose
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
+
 }

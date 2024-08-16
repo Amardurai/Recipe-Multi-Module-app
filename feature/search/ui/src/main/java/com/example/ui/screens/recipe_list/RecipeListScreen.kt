@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.common.components.EmptyScreen
+import com.example.common.components.LoadingIndicator
 import com.example.common.components.ObserveAsEvent
 import com.example.common.navigation.Dest
 import com.example.feature.search.domain.model.Recipe
@@ -83,7 +85,7 @@ fun RecipeListScreen(
             when {
                 uiState.isLoading -> LoadingIndicator()
 
-                uiState.error.isNotEmpty() -> ErrorMessage(uiState.error)
+                uiState.error.isNotEmpty() -> EmptyScreen(uiState.error)
 
                 else -> RecipeList(uiState.recipes) { recipeId ->
                     onEvent(RecipeListAction.OnRecipeItemClicked(recipeId))
@@ -92,20 +94,6 @@ fun RecipeListScreen(
             }
         }
 
-    }
-}
-
-@Composable
-fun ErrorMessage(error: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(error)
-    }
-}
-
-@Composable
-fun LoadingIndicator() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
     }
 }
 
