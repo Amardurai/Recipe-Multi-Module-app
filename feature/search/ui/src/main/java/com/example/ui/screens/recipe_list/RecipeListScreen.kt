@@ -1,5 +1,6 @@
 package com.example.ui.screens.recipe_list
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -49,15 +50,15 @@ import kotlinx.coroutines.flow.Flow
 fun RecipeListScreen(
     uiState: RecipeListState,
     events: Flow<RecipeListEvent>,
-    onEvent: (RecipeListAction) -> Unit,
+    onAction: (RecipeListAction) -> Unit,
     navHostController: NavHostController
 ) {
-
+    val context = LocalContext.current
     ObserveAsEvent(events) { event ->
         when (event) {
 
             is RecipeListEvent.OnError -> {
-
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
 
             is RecipeListEvent.GoToDetailScreen -> navHostController.navigate(
@@ -65,6 +66,7 @@ fun RecipeListScreen(
                     event.mealID
                 )
             )
+
         }
     }
     val query = rememberSaveable {
@@ -75,7 +77,7 @@ fun RecipeListScreen(
         topBar = {
             SearchBar(query = query.value, onQueryChange = {
                 query.value = it
-                onEvent.invoke(RecipeListAction.OnSearchQueryChange(it))
+                onAction.invoke(RecipeListAction.OnSearchQueryChange(it))
             })
         }
     ) { innerPadding ->
@@ -83,10 +85,8 @@ fun RecipeListScreen(
             when {
                 uiState.isLoading -> LoadingIndicator()
 
-                uiState.error.isNotEmpty() -> EmptyScreen(uiState.error)
-
                 else -> RecipeList(uiState.recipes) { recipeId ->
-                    onEvent(RecipeListAction.OnRecipeItemClicked(recipeId))
+                    onAction(RecipeListAction.OnRecipeItemClicked(recipeId))
                 }
 
             }
@@ -122,14 +122,14 @@ private fun RecipeList(recipes: List<Recipe>, onRecipeClick: (String) -> Unit) {
 
     LazyColumn {
         items(recipes, key = { it.idMeal.orEmpty() }) { recipe ->
-            RecipeCard(recipe, onRecipeClick)
+            DishCard(recipe, onRecipeClick)
         }
     }
 
 }
 
 @Composable
-fun RecipeCard(recipe: Recipe, onRecipeClick: (String) -> Unit) {
+fun DishCard(recipe: Recipe, onRecipeClick: (String) -> Unit) {
     Card(
         modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp),
         shape = RoundedCornerShape(12.dp),

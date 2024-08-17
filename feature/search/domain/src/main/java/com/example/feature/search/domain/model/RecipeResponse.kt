@@ -14,7 +14,7 @@ data class Recipe(
 data class RecipeDetails(
     val idMeal: String?,
     val strArea: String?,
-    val strMeal: String?,
+    val strMeal: String? = "",
     val strMealThumb: String?,
     val strCategory: String?,
     val strTags: String?,

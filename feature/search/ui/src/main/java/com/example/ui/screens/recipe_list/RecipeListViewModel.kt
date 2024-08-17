@@ -27,7 +27,7 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
     private val _uiState = MutableStateFlow(RecipeListState())
     val uiState = _uiState.asStateFlow()
 
-    val eventChannel = Channel<RecipeListEvent>()
+    private val eventChannel = Channel<RecipeListEvent>()
     val events = eventChannel.receiveAsFlow()
 
     private var searchJob: Job? = null
@@ -35,7 +35,7 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
     private fun search(query: String) = gelAllRecipesUseCase(query).onEach { result ->
         when (result) {
             NetworkResult.Loading -> _uiState.update { RecipeListState(isLoading = true) }
-            is NetworkResult.Error -> _uiState.update { RecipeListState(error = result.message) }
+            is NetworkResult.Error -> eventChannel.trySend(RecipeListEvent.OnError(result.message))
             is NetworkResult.Success -> _uiState.update { RecipeListState(recipes = result.data) }
         }
     }.launchIn(viewModelScope)
