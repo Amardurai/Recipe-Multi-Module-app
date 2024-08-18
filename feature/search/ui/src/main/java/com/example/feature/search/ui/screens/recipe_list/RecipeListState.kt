@@ -1,4 +1,4 @@
-package com.example.ui.screens.recipe_list
+package com.example.feature.search.ui.screens.recipe_list
 
 import com.example.feature.search.domain.model.Recipe
 

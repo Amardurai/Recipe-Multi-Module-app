@@ -1,4 +1,4 @@
-package com.example.ui.navigation
+package com.example.feature.search.ui.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -9,11 +9,13 @@ import androidx.navigation.toRoute
 import com.example.common.navigation.Dest
 import com.example.common.navigation.FeatureApi
 import com.example.common.navigation.SubGraphDest
-import com.example.ui.screens.details.RecipeDetailAction
-import com.example.ui.screens.details.RecipeDetailScreen
-import com.example.ui.screens.details.RecipeDetailViewModel
-import com.example.ui.screens.recipe_list.RecipeListScreen
-import com.example.ui.screens.recipe_list.RecipeListViewModel
+import com.example.feature.search.ui.screens.details.RecipeDetailAction
+import com.example.feature.search.ui.screens.details.RecipeDetailScreen
+import com.example.feature.search.ui.screens.details.RecipeDetailViewModel
+import com.example.feature.search.ui.screens.favorite.FavoriteScreen
+import com.example.feature.search.ui.screens.favorite.FavoriteViewModel
+import com.example.feature.search.ui.screens.recipe_list.RecipeListScreen
+import com.example.feature.search.ui.screens.recipe_list.RecipeListViewModel
 
 interface SearchFeatureApi : FeatureApi
 
@@ -43,6 +45,13 @@ class SearchFeatureApiImpl : SearchFeatureApi {
                 val events = viewModel.events
                 RecipeDetailScreen(uiState.value,events,viewModel::onAction,navHostController)
             }
+            composable<Dest.Favorite> {
+                val viewModel = hiltViewModel<FavoriteViewModel>()
+                val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+                val events = viewModel.events
+                FavoriteScreen(uiState.value, events, viewModel::onAction, navHostController)
+            }
+
         }
     }
 

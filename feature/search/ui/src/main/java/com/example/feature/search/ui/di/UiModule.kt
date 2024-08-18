@@ -1,7 +1,7 @@
-package com.example.ui.di
+package com.example.feature.search.ui.di
 
-import com.example.ui.navigation.SearchFeatureApi
-import com.example.ui.navigation.SearchFeatureApiImpl
+import com.example.feature.search.ui.navigation.SearchFeatureApi
+import com.example.feature.search.ui.navigation.SearchFeatureApiImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

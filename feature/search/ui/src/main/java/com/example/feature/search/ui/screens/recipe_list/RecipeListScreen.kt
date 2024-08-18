@@ -1,4 +1,4 @@
-package com.example.ui.screens.recipe_list
+package com.example.feature.search.ui.screens.recipe_list
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -15,8 +15,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -67,6 +69,10 @@ fun RecipeListScreen(
                 )
             )
 
+            RecipeListEvent.GoToFavoriteScreen -> navHostController.navigate(
+                Dest.Favorite
+            )
+
         }
     }
     val query = rememberSaveable {
@@ -79,6 +85,11 @@ fun RecipeListScreen(
                 query.value = it
                 onAction.invoke(RecipeListAction.OnSearchQueryChange(it))
             })
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { onAction.invoke(RecipeListAction.OnFavoriteClicked) }) {
+                Icon(imageVector = Icons.Default.Favorite, contentDescription = null)
+            }
         }
     ) { innerPadding ->
         Surface(modifier = Modifier.padding(innerPadding)) {
@@ -170,7 +181,7 @@ fun RecipeDetail(recipe: Recipe) {
 
         Text(
             text = recipe.strMeal.orEmpty(),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.titleMedium,
         )
 
         Spacer(modifier = Modifier.height(12.dp))

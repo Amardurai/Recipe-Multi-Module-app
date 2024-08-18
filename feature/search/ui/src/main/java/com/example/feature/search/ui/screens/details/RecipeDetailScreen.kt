@@ -1,4 +1,4 @@
-package com.example.ui.screens.details
+package com.example.feature.search.ui.screens.details
 
 import android.content.Intent
 import android.net.Uri
@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -69,8 +70,21 @@ fun RecipeDetailScreen(
     val context = LocalContext.current
     ObserveAsEvent(flow = events) { event ->
         when (event) {
-            is RecipeDetailEvent.Error -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            is RecipeDetailEvent.Error -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT)
+                .show()
+
             RecipeDetailEvent.GoToRecipeListScreen -> navHostController.popBackStack()
+            RecipeDetailEvent.OnRecipeDeleted -> Toast.makeText(
+                context,
+                "Recipe is removed from favorite",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            RecipeDetailEvent.OnRecipeInserted -> Toast.makeText(
+                context,
+                "Recipe is added to favorite",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -91,10 +105,22 @@ fun RecipeDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = Icons.Default.Star, contentDescription = null)
+                    IconButton(onClick = {
+                        onAction.invoke(
+                            RecipeDetailAction.OnFavoriteClicked(
+                                uiState.recipe
+                            )
+                        )
+                    }) {
+                        Icon(imageVector = Icons.Default.Favorite, contentDescription = null)
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        onAction.invoke(
+                            RecipeDetailAction.OnDeleteClicked(
+                                uiState.recipe
+                            )
+                        )
+                    }) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                     }
                 }
@@ -314,7 +340,7 @@ private fun RecipeDetailScreenPreview() {
     )
     RecipeDetailScreen(
         uiState = sampleState,
-        events = flow {  },
+        events = flow { },
         onAction = {},
         navHostController = rememberNavController()
     )
