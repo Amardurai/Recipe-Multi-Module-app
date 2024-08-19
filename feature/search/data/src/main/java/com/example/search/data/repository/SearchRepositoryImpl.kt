@@ -3,13 +3,18 @@ package com.example.search.data.repository
 import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.domain.model.RecipeDetails
 import com.example.feature.search.domain.repository.SearchRepository
+import com.example.search.data.local.RecipeDao
 import com.example.search.data.mapper.toDomain
 import com.example.search.data.remote.SearchAPIService
+import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 import javax.inject.Singleton
 
 @Singleton
-class SearchRepositoryImpl(val searchAPIService: SearchAPIService) : SearchRepository {
+class SearchRepositoryImpl(
+    private val searchAPIService: SearchAPIService,
+    private val recipeDao: RecipeDao
+) : SearchRepository {
     override suspend fun getRecipes(query: String): Result<List<Recipe>> {
         return try {
             val response = searchAPIService.getRecipes(query)
@@ -40,5 +45,17 @@ class SearchRepositoryImpl(val searchAPIService: SearchAPIService) : SearchRepos
             Result.failure(e)
         }
 
+    }
+
+    override suspend fun insertRecipe(recipe: RecipeDetails):Long {
+       return recipeDao.insert(recipe)
+    }
+
+    override suspend fun deleteRecipe(recipe: RecipeDetails): Int {
+        return recipeDao.delete(recipe)
+    }
+
+    override fun getAllRecipe(): Flow<List<RecipeDetails>> {
+        return recipeDao.getAllRecipe()
     }
 }

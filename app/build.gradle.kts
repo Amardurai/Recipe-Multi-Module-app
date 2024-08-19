@@ -57,7 +57,6 @@ dependencies {
     implementation(project(":feature:search:data"))
     implementation(project(":feature:search:domain"))
     implementation(project(":feature:search:ui"))
-    implementation(project(":media_player"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -83,5 +82,9 @@ dependencies {
 
     implementation(libs.navigation.compose)
     implementation(libs.androidx.runtime)
+
+    //Room
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
 }

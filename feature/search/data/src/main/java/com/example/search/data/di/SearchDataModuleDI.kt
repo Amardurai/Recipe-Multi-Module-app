@@ -1,6 +1,7 @@
 package com.example.search.data.di
 
 import com.example.feature.search.domain.repository.SearchRepository
+import com.example.search.data.local.RecipeDao
 import com.example.search.data.remote.SearchAPIService
 import com.example.search.data.repository.SearchRepositoryImpl
 import dagger.Module
@@ -34,7 +35,7 @@ object SearchDataModuleDI {
     }
 
     @Provides
-    fun provideSearchRepository(searchAPIService: SearchAPIService): SearchRepository =
-        SearchRepositoryImpl(searchAPIService)
+    fun provideSearchRepository(searchAPIService: SearchAPIService,recipeDao: RecipeDao): SearchRepository =
+        SearchRepositoryImpl(searchAPIService,recipeDao)
 
 }

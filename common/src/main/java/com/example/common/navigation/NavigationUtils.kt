@@ -18,4 +18,7 @@ sealed class Dest {
 
     @Serializable
     data class RecipeDetail(val id:String): Dest()
+
+    @Serializable
+    data object Favorite: Dest()
 }

@@ -19,7 +19,7 @@ fun List<RecipeResponse.RecipeDTO?>.toDomain(): List<Recipe> = map {
 
 fun RecipeResponse.RecipeDTO.toDomain(): RecipeDetails {
     return RecipeDetails(
-        idMeal = idMeal,
+        idMeal = idMeal.orEmpty(),
         strArea = strArea,
         strMeal = strMeal,
         strMealThumb = strMealThumb,
