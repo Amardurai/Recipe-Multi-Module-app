@@ -29,6 +29,10 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
 
     private var searchJob: Job? = null
 
+    init {
+        debounceSearch("Chicken")
+    }
+
     private fun search(query: String) = gelAllRecipesUseCase(query).onEach { result ->
         when (result) {
             NetworkResult.Loading -> _uiState.update { RecipeListState(isLoading = true) }

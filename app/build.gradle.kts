@@ -57,7 +57,6 @@ dependencies {
     implementation(project(":feature:search:data"))
     implementation(project(":feature:search:domain"))
     implementation(project(":feature:search:ui"))
-    implementation(project(":media_player"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
