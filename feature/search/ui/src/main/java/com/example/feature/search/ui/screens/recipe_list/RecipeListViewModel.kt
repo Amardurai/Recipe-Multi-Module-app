@@ -3,6 +3,7 @@ package com.example.feature.search.ui.screens.recipe_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.utils.NetworkResult
+import com.example.feature.search.domain.model.Country
 import com.example.feature.search.domain.use_case.remote.GetAllRecipeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -37,7 +38,11 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
         when (result) {
             NetworkResult.Loading -> _uiState.update { RecipeListState(isLoading = true) }
             is NetworkResult.Error -> eventChannel.trySend(RecipeListEvent.OnError(result.message))
-            is NetworkResult.Success -> _uiState.update { RecipeListState(recipes = result.data) }
+            is NetworkResult.Success -> {
+                _uiState.update { RecipeListState(recipes = result.data) }
+                val country = result.data.map { Country(it.strArea.orEmpty(),isSelect = false) }
+                _uiState.update { RecipeListState(country = country) }
+            }
         }
     }.launchIn(viewModelScope)
 
