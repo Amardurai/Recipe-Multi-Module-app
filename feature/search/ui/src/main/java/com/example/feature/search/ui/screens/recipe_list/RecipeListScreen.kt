@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -70,6 +72,7 @@ import com.example.common.components.EmptyScreen
 import com.example.common.components.LoadingIndicator
 import com.example.common.components.ObserveAsEvent
 import com.example.common.navigation.Dest
+import com.example.feature.search.domain.model.Country
 import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.ui.R
 import kotlinx.coroutines.flow.Flow
@@ -125,7 +128,13 @@ fun RecipeListScreen(
             },
             sheetState = bottomSheetState
         ) {
-            FilterBottomSheet(uiState)
+            FilterBottomSheet(
+                uiState = uiState,
+                onFilterChange = { selectedCountries ->
+
+                    onAction(RecipeListAction.OnCountryFilterChange(selectedCountries))
+                }
+            )
         }
     }
 
@@ -134,6 +143,8 @@ fun RecipeListScreen(
             SearchBar(query = query.value, onQueryChange = {
                 query.value = it
                 onAction.invoke(RecipeListAction.OnSearchQueryChange(it))
+            }, onFilterToggle = {
+                showFilterDialog = showFilterDialog.not()
             })
         },
         floatingActionButton = {
@@ -157,24 +168,46 @@ fun RecipeListScreen(
 
     }
 }
-
 @Composable
-fun FilterBottomSheet(uiState: RecipeListState) {
+fun FilterBottomSheet(
+    uiState: RecipeListState,
+    onFilterChange: (List<Country>) -> Unit
+) {
+    // Use a mutable state to hold selected countries
+    val selectedCountries = remember { uiState.country.toMutableList() }
+
     Column {
         Text(text = "Filter", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(16.dp))
+
         LazyColumn {
-            items(uiState.country) {
-                Checkbox(checked = !it.isSelect, onCheckedChange = {
-//                    onAction(RecipeListAction.OnCountryFilterChange(it))
-                })
+            itemsIndexed(selectedCountries) { index, country ->
+                val isChecked = remember(country.isSelect) { mutableStateOf(country.isSelect) }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isChecked.value,
+                        onCheckedChange = { newChecked ->
+                            isChecked.value = newChecked
+                            selectedCountries[index] = country.copy(isSelect = newChecked)
+                            onFilterChange(selectedCountries)
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = country.name)
+                }
             }
         }
     }
 }
 
 @Composable
-fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
+fun SearchBar(query: String, onQueryChange: (String) -> Unit,onFilterToggle: () -> Unit) {
     val focusRequester = remember { FocusRequester() }
     val isFocused = remember { mutableStateOf(false) }
 
@@ -209,7 +242,9 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
                         )
                     }
                 }
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    onFilterToggle.invoke()
+                }) {
                     Icon(
                         Icons.Filled.FilterList,
                         contentDescription = "Clear",
