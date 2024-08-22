@@ -7,4 +7,5 @@ sealed interface RecipeDetailAction {
     data class OnDeleteClicked(val recipe: RecipeDetails?) : RecipeDetailAction
     data class OnFavoriteClicked(val recipe: RecipeDetails?) : RecipeDetailAction
     data class FetchRecipeDetail(val id: String): RecipeDetailAction
+    data class OnPaletteExtracted(val palette: Map<String, String>) : RecipeDetailAction
 }
