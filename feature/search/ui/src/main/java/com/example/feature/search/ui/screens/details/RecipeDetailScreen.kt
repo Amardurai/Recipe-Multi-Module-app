@@ -283,7 +283,7 @@ fun RecipeList(recipe: RecipeDetails, vibrantColor: Color) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Recipes",
+            text = "Ingredients",
             style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.Bold,
                 color = vibrantColor
