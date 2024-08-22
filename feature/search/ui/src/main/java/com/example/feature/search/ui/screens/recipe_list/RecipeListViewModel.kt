@@ -3,6 +3,8 @@ package com.example.feature.search.ui.screens.recipe_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.utils.NetworkResult
+import com.example.feature.search.domain.model.Country
+import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.domain.use_case.remote.GetAllRecipeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -18,11 +20,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: GetAllRecipeUseCase) :
     ViewModel() {
+
+    var originalList = listOf<Recipe>()
     private val _uiState = MutableStateFlow(RecipeListState())
-    val uiState :StateFlow<RecipeListState> get() = _uiState.asStateFlow()
+    val uiState: StateFlow<RecipeListState> get() = _uiState.asStateFlow()
 
     private val eventChannel = Channel<RecipeListEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -35,9 +40,15 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
 
     private fun search(query: String) = gelAllRecipesUseCase(query).onEach { result ->
         when (result) {
-            NetworkResult.Loading -> _uiState.update { RecipeListState(isLoading = true) }
+            NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
             is NetworkResult.Error -> eventChannel.trySend(RecipeListEvent.OnError(result.message))
-            is NetworkResult.Success -> _uiState.update { RecipeListState(recipes = result.data) }
+            is NetworkResult.Success -> {
+                val country = result.data.map { Country(it.strArea.orEmpty(), isSelect = false) }
+                    .distinctBy { it.name }
+                _uiState.value = _uiState.value.copy(country = country, isLoading = false)
+                originalList = result.data
+                _uiState.value = _uiState.value.copy(recipes = originalList)
+            }
         }
     }.launchIn(viewModelScope)
 
@@ -51,6 +62,7 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
 
     fun onAction(recipeListAction: RecipeListAction) {
         when (recipeListAction) {
+
             is RecipeListAction.OnSearchQueryChange -> debounceSearch(recipeListAction.query)
 
             is RecipeListAction.OnRecipeItemClicked -> {
@@ -58,6 +70,21 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
             }
 
             RecipeListAction.OnFavoriteClicked -> eventChannel.trySend(RecipeListEvent.GoToFavoriteScreen)
+
+            is RecipeListAction.OnCountryFilterChange -> {
+
+                _uiState.value = _uiState.value.copy(country = recipeListAction.selectedCountry)
+                val selectedCountryNames = recipeListAction.selectedCountry.filter { it.isSelect }.map { it.name }
+
+                if (selectedCountryNames.isNotEmpty()) {
+                    val filteredRecipes = originalList.filter { recipe ->
+                        recipe.strArea in selectedCountryNames
+                    }
+                    _uiState.value = _uiState.value.copy(recipes = filteredRecipes)
+                } else {
+                    _uiState.value = _uiState.value.copy(recipes = originalList)
+                }
+            }
         }
 
     }

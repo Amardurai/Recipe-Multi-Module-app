@@ -12,39 +12,47 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -58,17 +66,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.common.components.EmptyScreen
 import com.example.common.components.LoadingIndicator
 import com.example.common.components.ObserveAsEvent
 import com.example.common.navigation.Dest
+import com.example.feature.search.domain.model.Country
 import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.ui.R
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeListScreen(
     uiState: RecipeListState,
@@ -96,8 +106,36 @@ fun RecipeListScreen(
 
         }
     }
+    var showFilterDialog by remember {
+        mutableStateOf(false)
+    }
+    val bottomSheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+
     val query = rememberSaveable {
         mutableStateOf("")
+    }
+
+
+    if (showFilterDialog) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                scope.launch {
+                    bottomSheetState.hide()
+                }.invokeOnCompletion {
+                    showFilterDialog = false
+                }
+            },
+            sheetState = bottomSheetState
+        ) {
+            FilterBottomSheet(
+                uiState = uiState,
+                onFilterChange = { selectedCountries ->
+
+                    onAction(RecipeListAction.OnCountryFilterChange(selectedCountries))
+                }
+            )
+        }
     }
 
     Scaffold(
@@ -105,6 +143,8 @@ fun RecipeListScreen(
             SearchBar(query = query.value, onQueryChange = {
                 query.value = it
                 onAction.invoke(RecipeListAction.OnSearchQueryChange(it))
+            }, onFilterToggle = {
+                showFilterDialog = showFilterDialog.not()
             })
         },
         floatingActionButton = {
@@ -118,7 +158,7 @@ fun RecipeListScreen(
         Surface(modifier = Modifier.padding(innerPadding)) {
             when {
                 uiState.isLoading -> LoadingIndicator()
-
+                uiState.recipes.isEmpty() -> EmptyScreen(message = "No recipes found")
                 else -> RecipeList(uiState.recipes) { recipeId ->
                     onAction(RecipeListAction.OnRecipeItemClicked(recipeId))
                 }
@@ -128,9 +168,48 @@ fun RecipeListScreen(
 
     }
 }
+@Composable
+fun FilterBottomSheet(
+    uiState: RecipeListState,
+    onFilterChange: (List<Country>) -> Unit
+) {
+    val countries = remember { mutableStateOf(uiState.country) }
+
+    Column {
+        Text(text = "Filter by country", style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LazyColumn {
+            itemsIndexed(countries.value) { index, country ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = country.isSelect,
+                        onCheckedChange = { isChecked ->
+                            val updatedCountries = countries.value.mapIndexed { i, currentCountry ->
+                                if (i == index) { currentCountry.copy(isSelect = isChecked)
+                                } else currentCountry
+                            }
+                            countries.value = updatedCountries
+
+                            onFilterChange(updatedCountries)
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = country.name)
+                }
+            }
+        }
+    }
+}
 
 @Composable
-fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
+fun SearchBar(query: String, onQueryChange: (String) -> Unit,onFilterToggle: () -> Unit) {
     val focusRequester = remember { FocusRequester() }
     val isFocused = remember { mutableStateOf(false) }
 
@@ -155,14 +234,26 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
             Icon(Icons.Filled.Search, "Search")
         },
         trailingIcon = {
-            if (query.isNotEmpty()) {
-                IconButton(onClick = { onQueryChange("") }) {
+            Row {
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = { onQueryChange("") }) {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = "Clear",
+                            tint = Color.Gray
+                        )
+                    }
+                }
+                IconButton(onClick = {
+                    onFilterToggle.invoke()
+                }) {
                     Icon(
-                        Icons.Filled.Close,
+                        Icons.Filled.FilterList,
                         contentDescription = "Clear",
                         tint = Color.Gray
                     )
                 }
+
             }
         },
         shape = RoundedCornerShape(24.dp),
