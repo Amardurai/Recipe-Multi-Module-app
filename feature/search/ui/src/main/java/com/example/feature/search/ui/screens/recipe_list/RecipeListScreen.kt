@@ -173,17 +173,15 @@ fun FilterBottomSheet(
     uiState: RecipeListState,
     onFilterChange: (List<Country>) -> Unit
 ) {
-    // Use a mutable state to hold selected countries
-    val selectedCountries = remember { uiState.country.toMutableList() }
+    val countries = remember { mutableStateOf(uiState.country) }
 
     Column {
-        Text(text = "Filter", style = MaterialTheme.typography.titleMedium)
+        Text(text = "Filter by country", style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 24.dp))
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn {
-            itemsIndexed(selectedCountries) { index, country ->
-                val isChecked = remember(country.isSelect) { mutableStateOf(country.isSelect) }
-
+            itemsIndexed(countries.value) { index, country ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -191,11 +189,15 @@ fun FilterBottomSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
-                        checked = isChecked.value,
-                        onCheckedChange = { newChecked ->
-                            isChecked.value = newChecked
-                            selectedCountries[index] = country.copy(isSelect = newChecked)
-                            onFilterChange(selectedCountries)
+                        checked = country.isSelect,
+                        onCheckedChange = { isChecked ->
+                            val updatedCountries = countries.value.mapIndexed { i, currentCountry ->
+                                if (i == index) { currentCountry.copy(isSelect = isChecked)
+                                } else currentCountry
+                            }
+                            countries.value = updatedCountries
+
+                            onFilterChange(updatedCountries)
                         }
                     )
                     Spacer(modifier = Modifier.width(8.dp))

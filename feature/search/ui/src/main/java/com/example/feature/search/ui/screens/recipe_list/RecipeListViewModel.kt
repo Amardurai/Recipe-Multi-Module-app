@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: GetAllRecipeUseCase) :
     ViewModel() {
@@ -42,7 +43,8 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
             NetworkResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
             is NetworkResult.Error -> eventChannel.trySend(RecipeListEvent.OnError(result.message))
             is NetworkResult.Success -> {
-                val country = result.data.map { Country(it.strArea.orEmpty(), isSelect = false) }.distinctBy { it.name }
+                val country = result.data.map { Country(it.strArea.orEmpty(), isSelect = false) }
+                    .distinctBy { it.name }
                 _uiState.value = _uiState.value.copy(country = country, isLoading = false)
                 originalList = result.data
                 _uiState.value = _uiState.value.copy(recipes = originalList)
@@ -60,6 +62,7 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
 
     fun onAction(recipeListAction: RecipeListAction) {
         when (recipeListAction) {
+
             is RecipeListAction.OnSearchQueryChange -> debounceSearch(recipeListAction.query)
 
             is RecipeListAction.OnRecipeItemClicked -> {
@@ -67,15 +70,20 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
             }
 
             RecipeListAction.OnFavoriteClicked -> eventChannel.trySend(RecipeListEvent.GoToFavoriteScreen)
-            is RecipeListAction.OnCountryFilterChange -> {
-                _uiState.value = _uiState.value.copy(country = recipeListAction.selectedCountry)
 
+            is RecipeListAction.OnCountryFilterChange -> {
+
+                _uiState.value = _uiState.value.copy(country = recipeListAction.selectedCountry)
                 val selectedCountryNames = recipeListAction.selectedCountry.filter { it.isSelect }.map { it.name }
 
-                val filteredRecipes = _uiState.value.recipes.filter { recipe ->
-                    recipe.strArea in selectedCountryNames
+                if (selectedCountryNames.isNotEmpty()) {
+                    val filteredRecipes = originalList.filter { recipe ->
+                        recipe.strArea in selectedCountryNames
+                    }
+                    _uiState.value = _uiState.value.copy(recipes = filteredRecipes)
+                } else {
+                    _uiState.value = _uiState.value.copy(recipes = originalList)
                 }
-                _uiState.value = _uiState.value.copy(recipes = filteredRecipes)
             }
         }
 

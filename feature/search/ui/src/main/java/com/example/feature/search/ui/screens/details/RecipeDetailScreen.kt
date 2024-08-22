@@ -1,6 +1,7 @@
 package com.example.feature.search.ui.screens.details
 
 import android.content.Intent
+import android.graphics.Color.parseColor
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -36,6 +37,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,9 +58,11 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.common.components.LoadingIndicator
 import com.example.common.components.ObserveAsEvent
+import com.example.common.utils.PaletteGenerator
 import com.example.feature.search.domain.model.RecipeDetails
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 
 typealias RecipeData = Pair<String, String>?
 
@@ -67,6 +75,12 @@ fun RecipeDetailScreen(
     navHostController: NavHostController
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val primaryColor = MaterialTheme.colorScheme.primary
+
+    var vibrantColor by remember { mutableStateOf(primaryColor) }
+
     ObserveAsEvent(flow = events) { event ->
         when (event) {
             is RecipeDetailEvent.Error -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT)
@@ -104,13 +118,14 @@ fun RecipeDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        onAction.invoke(
-                            RecipeDetailAction.OnFavoriteClicked(
-                                uiState.recipe
+                    IconButton(
+                        onClick = {
+                            onAction.invoke(
+                                RecipeDetailAction.OnFavoriteClicked(
+                                    uiState.recipe
+                                )
                             )
-                        )
-                    }) {
+                        }) {
                         Icon(imageVector = Icons.Default.Favorite, contentDescription = null)
                     }
                     IconButton(onClick = {
@@ -134,7 +149,22 @@ fun RecipeDetailScreen(
             if (uiState.loading) {
                 LoadingIndicator()
             }
+            if (uiState.colorPalette.isNotEmpty()) {
+                vibrantColor = Color(parseColor(uiState.colorPalette["vibrant"]))
+            }
             uiState.recipe?.let { recipe ->
+
+                scope.launch {
+                    val bitMap = PaletteGenerator.convertImageUrlToBitmap(
+                        imageUrl = recipe.strMealThumb.orEmpty(),
+                        context = context
+                    )
+                    bitMap?.let {
+                        val palette = PaletteGenerator.extractColorsFromBitmap(it)
+                        onAction.invoke(RecipeDetailAction.OnPaletteExtracted(palette))
+                    }
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -157,7 +187,7 @@ fun RecipeDetailScreen(
                             text = "Instructions",
                             style = MaterialTheme.typography.headlineSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = vibrantColor
                             ),
                             modifier = Modifier
                         )
@@ -171,7 +201,7 @@ fun RecipeDetailScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        RecipeList(recipe = recipe)
+                        RecipeList(recipe = recipe, vibrantColor)
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -179,7 +209,7 @@ fun RecipeDetailScreen(
                             text = "Watch Youtube Video",
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = vibrantColor
                             )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -245,7 +275,7 @@ fun getYoutubeVideoId(url: String): String {
 }
 
 @Composable
-fun RecipeList(recipe: RecipeDetails) {
+fun RecipeList(recipe: RecipeDetails, vibrantColor: Color) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -253,10 +283,10 @@ fun RecipeList(recipe: RecipeDetails) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Recipes",
+            text = "Ingredients",
             style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = vibrantColor
             ),
             modifier = Modifier
         )

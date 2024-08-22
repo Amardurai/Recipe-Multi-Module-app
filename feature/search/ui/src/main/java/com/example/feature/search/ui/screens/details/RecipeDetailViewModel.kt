@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.utils.NetworkResult
 import com.example.feature.search.domain.use_case.local.DeleteRecipeUseCase
-import com.example.feature.search.domain.use_case.local.GetAllRecipesUseCase
 import com.example.feature.search.domain.use_case.local.InsertRecipeUseCase
 import com.example.feature.search.domain.use_case.remote.GetRecipeDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,6 +59,10 @@ class RecipeDetailViewModel @Inject constructor(
                 insertRecipeUseCase(recipeDetailAction.recipe!!).onEach {
                     if (it) eventChannel.trySend(RecipeDetailEvent.OnRecipeInserted)
                 }.launchIn(viewModelScope)
+            }
+
+            is RecipeDetailAction.OnPaletteExtracted -> {
+                _uiState.update { it.copy(colorPalette = recipeDetailAction.palette) }
             }
         }
     }
