@@ -2,6 +2,8 @@ package com.example.feature.search.ui.screens.recipe_list
 
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +47,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +62,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -284,6 +288,14 @@ private fun RecipeList(recipes: List<Recipe>, onRecipeClick: (String) -> Unit) {
 
 @Composable
 fun DishCard(recipe: Recipe, onClick: (String) -> Unit) {
+
+    val animatable = remember {
+        Animatable(0.5f)
+    }
+    LaunchedEffect(key1 = true) {
+        animatable.animateTo(1f, tween(350, easing = FastOutSlowInEasing))
+    }
+
     Card(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.elevatedCardElevation(
@@ -291,7 +303,10 @@ fun DishCard(recipe: Recipe, onClick: (String) -> Unit) {
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp).graphicsLayer {
+                scaleX = animatable.value
+                scaleY = animatable.value
+            }
             .clickable {
                 onClick(recipe.idMeal.orEmpty())
             }
@@ -368,57 +383,6 @@ fun RecipeImage(recipe: Recipe) {
             )
         }
     )
-}
-
-
-@Composable
-fun RecipeDetail(recipe: Recipe) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp, horizontal = 12.dp)
-    ) {
-
-        Text(
-            text = recipe.strMeal.orEmpty(),
-            style = MaterialTheme.typography.titleMedium,
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = recipe.strInstruction.orEmpty(),
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 4,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        recipe.strTags?.let { RecipeTags(it) }
-
-
-    }
-
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun RecipeTags(tags: String) {
-    FlowRow {
-        tags.split(",").forEach { tag ->
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    .background(Color.White, shape = RoundedCornerShape(24.dp))
-                    .border(1.dp, Color.Red, RoundedCornerShape(24.dp))
-                    .padding(vertical = 6.dp, horizontal = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(tag, style = MaterialTheme.typography.bodySmall.copy(color = Color.Black))
-            }
-        }
-    }
 }
 
 

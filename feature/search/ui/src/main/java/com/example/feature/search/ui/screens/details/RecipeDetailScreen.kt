@@ -4,6 +4,11 @@ import android.content.Intent
 import android.graphics.Color.parseColor
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -45,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -80,6 +86,27 @@ fun RecipeDetailScreen(
     val primaryColor = MaterialTheme.colorScheme.primary
 
     var vibrantColor by remember { mutableStateOf(primaryColor) }
+
+    var isClicked by remember { mutableStateOf(false) }
+
+    val favoriteColor by animateColorAsState(
+        targetValue = if (isClicked) Color.Red else Color.Gray,
+        label = ""
+    )
+    var showPlayer by remember { mutableStateOf(false) }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isClicked) 1.2f else 1.0f,
+        animationSpec = keyframes {
+            durationMillis = 500
+            1.2f at 100
+            1.4f at 200
+            1.2f at 300
+            1.0f at 500
+        }
+    )
+
+
 
     ObserveAsEvent(flow = events) { event ->
         when (event) {
@@ -120,13 +147,16 @@ fun RecipeDetailScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            onAction.invoke(
-                                RecipeDetailAction.OnFavoriteClicked(
-                                    uiState.recipe
-                                )
-                            )
-                        }) {
-                        Icon(imageVector = Icons.Default.Favorite, contentDescription = null)
+                            isClicked = true
+                            onAction.invoke(RecipeDetailAction.OnFavoriteClicked(uiState.recipe))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = null,
+                            tint = favoriteColor,
+                            modifier = Modifier.scale(scale)
+                        )
                     }
                     IconButton(onClick = {
                         onAction.invoke(
@@ -217,47 +247,47 @@ fun RecipeDetailScreen(
 
                         recipe.strYoutube?.let { youtubeUrl ->
                             val videoId = getYoutubeVideoId(youtubeUrl)
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        val intent = Intent(
-                                            Intent.ACTION_VIEW,
-                                            Uri.parse(youtubeUrl)
-                                        )
-                                        context.startActivity(intent)
-                                    },
-                                elevation = CardDefaults.cardElevation(4.dp),
-                                shape = RoundedCornerShape(8.dp),
-                            ) {
-                                Box(
+
+                            if (showPlayer) {
+                                MediaPlayerUi(modifier = Modifier.fillMaxSize(), videoId = videoId)
+                            } else {
+                                Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(200.dp)
+                                        .clickable {
+                                            showPlayer = true
+                                        },
+                                    elevation = CardDefaults.cardElevation(4.dp),
+                                    shape = RoundedCornerShape(8.dp),
                                 ) {
-                                    AsyncImage(
+                                    Box(
                                         modifier = Modifier
-                                            .fillMaxSize(),
-                                        model = ImageRequest.Builder(LocalContext.current)
-                                            .data("https://img.youtube.com/vi/$videoId/hqdefault.jpg")
-                                            .crossfade(true)
-                                            .build(),
-                                        contentDescription = "YouTube Thumbnail",
-                                        contentScale = ContentScale.Crop
-                                    )
-                                    Icon(
-                                        imageVector = Icons.Filled.PlayArrow,
-                                        contentDescription = "Play",
-                                        modifier = Modifier
-                                            .align(Alignment.Center)
-                                            .size(64.dp)
-                                            .background(
-                                                Color.White.copy(alpha = 0.6f),
-                                                CircleShape
-                                            )
-                                            .padding(8.dp),
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                    ) {
+                                        AsyncImage(
+                                            modifier = Modifier.fillMaxSize(),
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data("https://img.youtube.com/vi/$videoId/hqdefault.jpg")
+                                                .crossfade(true)
+                                                .build(),
+                                            contentDescription = "YouTube Thumbnail",
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        Icon(
+                                            imageVector = Icons.Filled.PlayArrow,
+                                            contentDescription = "Play",
+                                            modifier = Modifier
+                                                .align(Alignment.Center)
+                                                .size(64.dp)
+                                                .background(
+                                                    Color.White.copy(alpha = 0.6f),
+                                                    CircleShape
+                                                )
+                                                .padding(8.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
                                 }
                             }
                         }
