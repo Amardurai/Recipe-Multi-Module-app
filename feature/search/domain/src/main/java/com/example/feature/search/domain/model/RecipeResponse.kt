@@ -2,21 +2,24 @@ package com.example.feature.search.domain.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
+@Serializable
+@Entity
 data class Recipe(
-    val idMeal: String?,
+    @PrimaryKey(autoGenerate = false)
+    val idMeal: String,
     val strArea: String?,
     val strMeal: String?,
     val strMealThumb: String?,
     val strCategory: String?,
     val strTags: String?,
     val strYoutube: String?,
-    val strInstruction: String?
+    val strInstruction: String?,
+    val ingredients: List<Pair<String, String>?>,
 )
 
-@Entity
 data class RecipeDetails(
-    @PrimaryKey(autoGenerate = false)
     val idMeal: String,
     val strArea: String?,
     val strMeal: String? = "",

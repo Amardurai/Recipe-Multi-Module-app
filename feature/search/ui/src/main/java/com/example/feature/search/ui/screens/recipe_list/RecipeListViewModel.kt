@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -66,7 +65,7 @@ class RecipeListViewModel @Inject constructor(private val gelAllRecipesUseCase: 
             is RecipeListAction.OnSearchQueryChange -> debounceSearch(recipeListAction.query)
 
             is RecipeListAction.OnRecipeItemClicked -> {
-                eventChannel.trySend(RecipeListEvent.GoToDetailScreen(recipeListAction.id))
+                eventChannel.trySend(RecipeListEvent.GoToDetailScreen(recipeListAction.recipe))
             }
 
             RecipeListAction.OnFavoriteClicked -> eventChannel.trySend(RecipeListEvent.GoToFavoriteScreen)

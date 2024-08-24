@@ -2,7 +2,6 @@ package com.example.feature.search.ui.screens.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.common.utils.NetworkResult
 import com.example.feature.search.domain.use_case.local.DeleteRecipeUseCase
 import com.example.feature.search.domain.use_case.local.InsertRecipeUseCase
 import com.example.feature.search.domain.use_case.remote.GetRecipeDetailUseCase
@@ -29,6 +28,7 @@ class RecipeDetailViewModel @Inject constructor(
     private val eventChannel = Channel<RecipeDetailEvent>()
     val events = eventChannel.receiveAsFlow()
 
+/*
     private fun getRecipeDetails(id: String) = getRecipeDetailUseCase(id).onEach { networkResult ->
         when (networkResult) {
             NetworkResult.Loading -> _uiState.update { RecipeDetailState(loading = true) }
@@ -36,11 +36,12 @@ class RecipeDetailViewModel @Inject constructor(
             is NetworkResult.Success -> _uiState.update { RecipeDetailState(recipe = networkResult.data) }
         }
     }.launchIn(viewModelScope)
+*/
 
     fun onAction(recipeDetailAction: RecipeDetailAction) {
         when (recipeDetailAction) {
-            is RecipeDetailAction.FetchRecipeDetail -> {
-                getRecipeDetails(recipeDetailAction.id)
+            is RecipeDetailAction.UpdateRecipeDetail -> {
+                _uiState.update { _uiState.value.copy(recipe = recipeDetailAction.recipe) }
             }
 
             RecipeDetailAction.OnBackButtonClicked -> {

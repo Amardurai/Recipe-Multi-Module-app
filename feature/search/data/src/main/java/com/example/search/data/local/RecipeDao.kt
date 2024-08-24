@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.Flow
 interface RecipeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(recipe: RecipeDetails):Long
+    suspend fun insert(recipe: Recipe):Long
 
     @Delete
-    suspend fun delete(recipe: RecipeDetails):Int
+    suspend fun delete(recipe: Recipe):Int
 
-    @Query("SELECT * FROM RecipeDetails")
-    fun getAllRecipe(): Flow<List<RecipeDetails>>
+    @Query("SELECT * FROM Recipe")
+    fun getAllRecipe(): Flow<List<Recipe>>
 
 }

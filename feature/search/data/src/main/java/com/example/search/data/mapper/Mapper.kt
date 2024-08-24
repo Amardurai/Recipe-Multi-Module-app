@@ -6,7 +6,7 @@ import com.example.search.data.model.RecipeResponse
 
 fun List<RecipeResponse.RecipeDTO?>.toDomain(): List<Recipe> = map {
     Recipe(
-        idMeal = it?.idMeal,
+        idMeal = it?.idMeal.orEmpty(),
         strArea = it?.strArea,
         strMeal = it?.strMeal,
         strMealThumb = it?.strMealThumb,
@@ -14,6 +14,7 @@ fun List<RecipeResponse.RecipeDTO?>.toDomain(): List<Recipe> = map {
         strTags = it?.strTags,
         strYoutube = it?.strYoutube,
         strInstruction = it?.strInstructions,
+        ingredients = it?.getIngredientPairsWithItsMeasure()!!
     )
 }
 

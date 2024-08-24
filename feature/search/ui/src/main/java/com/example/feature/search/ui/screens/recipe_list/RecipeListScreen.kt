@@ -1,19 +1,21 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package com.example.feature.search.ui.screens.recipe_list
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,10 +77,10 @@ import coil.request.ImageRequest
 import com.example.common.components.EmptyScreen
 import com.example.common.components.LoadingIndicator
 import com.example.common.components.ObserveAsEvent
-import com.example.common.navigation.Dest
 import com.example.feature.search.domain.model.Country
 import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.ui.R
+import com.example.feature.search.ui.navigation.Dest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -88,8 +90,8 @@ fun RecipeListScreen(
     uiState: RecipeListState,
     events: Flow<RecipeListEvent>,
     onAction: (RecipeListAction) -> Unit,
-    navHostController: NavHostController
-) {
+    navHostController: NavHostController,
+    ) {
     val context = LocalContext.current
     ObserveAsEvent(events) { event ->
         when (event) {
@@ -100,7 +102,7 @@ fun RecipeListScreen(
 
             is RecipeListEvent.GoToDetailScreen -> navHostController.navigate(
                 Dest.RecipeDetail(
-                    event.mealID
+                    event.recipe
                 )
             )
 
@@ -180,8 +182,10 @@ fun FilterBottomSheet(
     val countries = remember { mutableStateOf(uiState.country) }
 
     Column {
-        Text(text = "Filter by country", style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 24.dp))
+        Text(
+            text = "Filter by country", style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn {
@@ -196,7 +200,8 @@ fun FilterBottomSheet(
                         checked = country.isSelect,
                         onCheckedChange = { isChecked ->
                             val updatedCountries = countries.value.mapIndexed { i, currentCountry ->
-                                if (i == index) { currentCountry.copy(isSelect = isChecked)
+                                if (i == index) {
+                                    currentCountry.copy(isSelect = isChecked)
                                 } else currentCountry
                             }
                             countries.value = updatedCountries
@@ -213,7 +218,7 @@ fun FilterBottomSheet(
 }
 
 @Composable
-fun SearchBar(query: String, onQueryChange: (String) -> Unit,onFilterToggle: () -> Unit) {
+fun SearchBar(query: String, onQueryChange: (String) -> Unit, onFilterToggle: () -> Unit) {
     val focusRequester = remember { FocusRequester() }
     val isFocused = remember { mutableStateOf(false) }
 
@@ -276,10 +281,10 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit,onFilterToggle: () 
 }
 
 @Composable
-private fun RecipeList(recipes: List<Recipe>, onRecipeClick: (String) -> Unit) {
+private fun RecipeList(recipes: List<Recipe>, onRecipeClick: (Recipe) -> Unit) {
 
     LazyColumn {
-        items(recipes, key = { it.idMeal.orEmpty() }) { recipe ->
+        items(recipes, key = { it.idMeal }) { recipe ->
             DishCard(recipe, onRecipeClick)
         }
     }
@@ -287,7 +292,7 @@ private fun RecipeList(recipes: List<Recipe>, onRecipeClick: (String) -> Unit) {
 }
 
 @Composable
-fun DishCard(recipe: Recipe, onClick: (String) -> Unit) {
+fun DishCard(recipe: Recipe, onClick: (Recipe) -> Unit) {
 
     val animatable = remember {
         Animatable(0.5f)
@@ -303,12 +308,13 @@ fun DishCard(recipe: Recipe, onClick: (String) -> Unit) {
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp).graphicsLayer {
+            .padding(8.dp)
+            .graphicsLayer {
                 scaleX = animatable.value
                 scaleY = animatable.value
             }
             .clickable {
-                onClick(recipe.idMeal.orEmpty())
+                onClick(recipe)
             }
     ) {
         Box(

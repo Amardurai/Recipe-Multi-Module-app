@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.youtube.video.player)
+    implementation(libs.androidx.animation)
 
     //Compose Preview
     debugImplementation(libs.androidx.ui.tooling)

@@ -1,14 +1,10 @@
 package com.example.feature.search.ui.screens.details
 
-import android.content.Intent
 import android.graphics.Color.parseColor
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -65,7 +61,7 @@ import coil.request.ImageRequest
 import com.example.common.components.LoadingIndicator
 import com.example.common.components.ObserveAsEvent
 import com.example.common.utils.PaletteGenerator
-import com.example.feature.search.domain.model.RecipeDetails
+import com.example.feature.search.domain.model.Recipe
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -78,7 +74,7 @@ fun RecipeDetailScreen(
     uiState: RecipeDetailState,
     events: Flow<RecipeDetailEvent>,
     onAction: (RecipeDetailAction) -> Unit,
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -305,7 +301,7 @@ fun getYoutubeVideoId(url: String): String {
 }
 
 @Composable
-fun RecipeList(recipe: RecipeDetails, vibrantColor: Color) {
+fun RecipeList(recipe: Recipe, vibrantColor: Color) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -379,7 +375,7 @@ fun getIngredientImageUrl(name: String) = "https://www.themealdb.com/images/ingr
 @Preview(showBackground = true)
 @Composable
 private fun RecipeDetailScreenPreview() {
-    val sampleRecipe = RecipeDetails(
+    val sampleRecipe = Recipe(
         strMeal = "Spaghetti Bolognese",
         strMealThumb = "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg",
         strInstruction = "Cook spaghetti and prepare the Bolognese sauce...Cook spaghetti and prepare the Bolognese sauce...Cook spaghetti and prepare the Bolognese sauce...",
@@ -401,6 +397,6 @@ private fun RecipeDetailScreenPreview() {
         uiState = sampleState,
         events = flow { },
         onAction = {},
-        navHostController = rememberNavController()
+        navHostController = rememberNavController(),
     )
 }

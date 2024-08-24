@@ -2,7 +2,7 @@ package com.example.feature.search.ui.screens.favorite
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.feature.search.domain.model.RecipeDetails
+import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.domain.use_case.local.GetAllRecipesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class FavoriteViewModel @Inject constructor(private val getAllRecipesUseCase: GetAllRecipesUseCase) :
     ViewModel() {
 
-    private var originalList = listOf<RecipeDetails>()
+    private var originalList = listOf<Recipe>()
 
     private val _uiState = MutableStateFlow(FavoriteUiState())
     val uiState : StateFlow<FavoriteUiState> get() = _uiState.asStateFlow()
@@ -56,7 +56,7 @@ class FavoriteViewModel @Inject constructor(private val getAllRecipesUseCase: Ge
             FavoriteAction.LessIngredientOrder -> sortRecipes(SortType.LessIngredientOrder)
             FavoriteAction.RestSort -> sortRecipes(SortType.RestSort)
             is FavoriteAction.ShowDetail -> {
-                eventChannel.trySend(FavoriteEvent.GoToRecipeDetail(action.id))
+                eventChannel.trySend(FavoriteEvent.GoToRecipeDetail(action.recipe))
             }
         }
     }

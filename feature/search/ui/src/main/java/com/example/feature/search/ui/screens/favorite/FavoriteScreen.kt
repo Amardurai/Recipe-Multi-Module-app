@@ -1,5 +1,8 @@
 package com.example.feature.search.ui.screens.favorite
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,27 +30,27 @@ import androidx.navigation.compose.rememberNavController
 import com.example.common.components.EmptyScreen
 import com.example.common.components.LoadingIndicator
 import com.example.common.components.ObserveAsEvent
-import com.example.common.navigation.Dest
 import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.ui.R
+import com.example.feature.search.ui.navigation.Dest
 import com.example.feature.search.ui.screens.recipe_list.DishCard
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun FavoriteScreen(
     uiState: FavoriteUiState,
     events: Flow<FavoriteEvent>,
     onAction: (FavoriteAction) -> Unit,
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
     val showDropDown = rememberSaveable { mutableStateOf(false) }
     val selectedItem = rememberSaveable { mutableIntStateOf(0) }
 
     ObserveAsEvent(flow = events) { event ->
         when (event) {
-            is FavoriteEvent.GoToRecipeDetail -> navHostController.navigate(Dest.RecipeDetail(event.id))
+            is FavoriteEvent.GoToRecipeDetail -> navHostController.navigate(Dest.RecipeDetail(event.recipe))
         }
 
     }
@@ -109,7 +112,8 @@ fun FavoriteScreen(
                                     strCategory = it.strCategory,
                                     strTags = it.strTags,
                                     strYoutube = it.strYoutube,
-                                    strInstruction = it.strInstruction
+                                    strInstruction = it.strInstruction,
+                                    ingredients = it.ingredients,
                                 )
                             }
 

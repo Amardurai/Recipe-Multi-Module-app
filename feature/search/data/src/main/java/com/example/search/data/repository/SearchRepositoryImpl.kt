@@ -47,15 +47,15 @@ class SearchRepositoryImpl(
 
     }
 
-    override suspend fun insertRecipe(recipe: RecipeDetails):Long {
+    override suspend fun insertRecipe(recipe: Recipe):Long {
        return recipeDao.insert(recipe)
     }
 
-    override suspend fun deleteRecipe(recipe: RecipeDetails): Int {
+    override suspend fun deleteRecipe(recipe: Recipe): Int {
         return recipeDao.delete(recipe)
     }
 
-    override fun getAllRecipe(): Flow<List<RecipeDetails>> {
+    override fun getAllRecipe(): Flow<List<Recipe>> {
         return recipeDao.getAllRecipe()
     }
 }

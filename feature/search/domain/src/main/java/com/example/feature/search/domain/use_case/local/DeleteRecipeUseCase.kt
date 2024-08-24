@@ -1,5 +1,6 @@
 package com.example.feature.search.domain.use_case.local
 
+import com.example.feature.search.domain.model.Recipe
 import com.example.feature.search.domain.model.RecipeDetails
 import com.example.feature.search.domain.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers
@@ -9,7 +10,7 @@ import javax.inject.Inject
 
 class DeleteRecipeUseCase @Inject constructor(val searchRepository: SearchRepository) {
 
-    operator fun invoke(recipe: RecipeDetails) = flow {
+    operator fun invoke(recipe: Recipe) = flow {
         val rowAffected = searchRepository.deleteRecipe(recipe)
         if (rowAffected > 0) emit(true) else emit(false)
     }.flowOn(Dispatchers.IO)
