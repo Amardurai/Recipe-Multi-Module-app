@@ -53,6 +53,8 @@ dependencies {
     implementation(libs.kotlinx.serialization)
     implementation(libs.androidx.runtime)
 
+    implementation(libs.lottie.compose)
+
     //Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
